@@ -540,8 +540,8 @@ class ComponentSupervisionAgent(AgentModule):
         self.services = res["Value"]
         for service, options in sorted(self.services.items()):
             self.log.debug(f"Checking URL for {service} with options {options}")
-            # ignore SystemAdministrator, does not have URLs
-            if "SystemAdministrator" in service:
+            # SystemAdministrator and the Tornado runner do not have service URLs.
+            if "SystemAdministrator" in service or service == "Tornado__Tornado":
                 continue
             self._checkServiceURL(service, options)
 

@@ -705,6 +705,24 @@ class TestComponentSupervisionAgent(unittest.TestCase):
             res = self.restartAgent.checkURLs()
         self.assertTrue(res["OK"])
 
+    @patch("DIRAC.FrameworkSystem.Agent.ComponentSupervisionAgent.gConfig", new=MagicMock())
+    def test_checkURLs_skips_tornado(self):
+        """Do not generate a service URL for the Tornado runner."""
+        options = {
+            "Module": "Tornado",
+            "Port": "8443",
+            "Protocol": None,
+            "RunitStatus": "Run",
+            "System": "Tornado",
+        }
+        self.restartAgent.getRunningInstances = MagicMock(return_value=S_OK({"Tornado__Tornado": options}))
+        self.restartAgent._checkServiceURL = MagicMock()
+
+        res = self.restartAgent.checkURLs()
+
+        self.assertTrue(res["OK"])
+        self.restartAgent._checkServiceURL.assert_not_called()
+
 
 if __name__ == "__main__":
     SUITE = unittest.defaultTestLoader.loadTestsFromTestCase(TestComponentSupervisionAgent)
